@@ -25,7 +25,7 @@ import { validateChatContext } from "../utils/context_paths_utils";
 import { readSettings } from "@/main/settings";
 import { extractMentionedAppsCodebases } from "../utils/mention_apps";
 import { parseAppMentions } from "@/shared/parse_mention_apps";
-import { isTurboEditsV2Enabled } from "@/lib/schemas";
+import { isTurboEditsV2Enabled, isBasicAgentMode } from "@/lib/schemas";
 import { DyadError, DyadErrorKind } from "@/errors/dyad_error";
 
 const logger = log.scope("token_count_handlers");
@@ -68,16 +68,13 @@ export function registerTokenCountHandlers() {
       const mentionedAppNames = parseAppMentions(req.input);
 
       // Count system prompt tokens
-      // Migration on read converts "agent" to "build", so no need to check for it here
       const themePrompt = await getThemePromptById(chat.app?.themeId ?? null);
       let systemPrompt = constructSystemPrompt({
         aiRules: await readAiRules(getDyadAppPath(chat.app.path)),
-        chatMode:
-          settings.selectedChatMode === "local-agent"
-            ? "build"
-            : settings.selectedChatMode,
+        chatMode: settings.selectedChatMode,
         enableTurboEditsV2: isTurboEditsV2Enabled(settings),
         themePrompt,
+        basicAgentMode: isBasicAgentMode(settings),
       });
       let supabaseContext = "";
 

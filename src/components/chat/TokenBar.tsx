@@ -57,7 +57,7 @@ export function TokenBar({ chatId }: TokenBarProps) {
           <TooltipTrigger className="w-full">
             <div className="w-full">
               <div className="flex gap-3 mb-1 text-xs text-muted-foreground">
-                <span>Tokens: {totalTokens.toLocaleString()}</span>
+                <span>Tokens: ~{totalTokens.toLocaleString()}</span>
                 <span>{Math.round(percentUsed)}%</span>
                 <span>
                   Context window: {(contextWindow / 1000).toFixed(0)}K
@@ -94,7 +94,7 @@ export function TokenBar({ chatId }: TokenBarProps) {
           </TooltipTrigger>
           <TooltipContent side="top" className="w-64 p-2">
             <div className="space-y-1">
-              <div className="font-medium">Token Usage Breakdown</div>
+              <div className="font-medium">Token Usage Breakdown (estimate)</div>
               <div className="grid grid-cols-[20px_1fr_auto] gap-x-2 items-center">
                 <MessageSquare size={12} className="text-blue-500" />
                 <span>Message History</span>

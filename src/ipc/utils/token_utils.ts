@@ -4,9 +4,13 @@ import { Message } from "@/ipc/types";
 
 import { findLanguageModel } from "./findLanguageModel";
 
-// Estimate tokens (4 characters per token)
+// Estimate tokens using 3 characters per token.
+// Code-heavy content (TypeScript, SQL schemas, JSON) typical in Dyad projects
+// tends to tokenize at ~2.5-3 chars/token, making 4 chars/token too optimistic.
+// Using 3 chars/token gives a more conservative estimate that better reflects
+// actual tokenizer output for mixed code/text content.
 export const estimateTokens = (text: string): number => {
-  return Math.ceil(text.length / 4);
+  return Math.ceil(text.length / 3);
 };
 
 export const estimateMessagesTokens = (messages: Message[]): number => {
