@@ -40,6 +40,7 @@ export const LocalModelSchema = z.object({
   provider: z.enum(["ollama", "lmstudio"]),
   modelName: z.string(),
   displayName: z.string(),
+  contextWindow: z.number().optional(),
 });
 
 export type LocalModel = z.infer<typeof LocalModelSchema>;

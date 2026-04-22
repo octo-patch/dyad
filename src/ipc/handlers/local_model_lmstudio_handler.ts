@@ -38,6 +38,7 @@ export async function fetchLMStudioModels(): Promise<{ models: LocalModel[] }> {
       modelName: model.id,
       displayName: model.id,
       provider: "lmstudio",
+      contextWindow: model.max_context_length || undefined,
     }));
 
   logger.info(`Successfully fetched ${models.length} models from LM Studio`);

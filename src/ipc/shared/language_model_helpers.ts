@@ -13,6 +13,7 @@ import {
   PROVIDER_TO_ENV_VAR,
 } from "./language_model_constants";
 import { getBuiltinLanguageModelCatalog } from "./remote_language_model_catalog";
+import { fetchLMStudioModels } from "../handlers/local_model_lmstudio_handler";
 
 const logger = log.scope("language_model_helpers");
 /**
@@ -175,7 +176,25 @@ export async function getLanguageModels({
     }
   }
 
-  return [...hardcodedModels, ...customModels];
+  // For LM Studio, fetch models from the local API to get their context windows.
+  // This allows getContextWindow() to return the correct value instead of the
+  // 128K default when an LM Studio model is selected.
+  let lmStudioModels: LanguageModel[] = [];
+  if (providerId === "lmstudio") {
+    try {
+      const { models } = await fetchLMStudioModels();
+      lmStudioModels = models.map((model) => ({
+        apiName: model.modelName,
+        displayName: model.displayName,
+        contextWindow: model.contextWindow,
+        type: "local" as const,
+      }));
+    } catch {
+      // LM Studio is not available; continue with empty local models list
+    }
+  }
+
+  return [...hardcodedModels, ...customModels, ...lmStudioModels];
 }
 
 /**
