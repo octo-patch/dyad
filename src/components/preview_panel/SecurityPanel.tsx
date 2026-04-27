@@ -1,6 +1,9 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { selectedAppIdAtom } from "@/atoms/appAtoms";
-import { selectedChatIdAtom } from "@/atoms/chatAtoms";
+import {
+  selectedChatIdAtom,
+  pushRecentViewedChatIdAtom,
+} from "@/atoms/chatAtoms";
 import { useSecurityReview } from "@/hooks/useSecurityReview";
 import { ipc } from "@/ipc/types";
 import { queryKeys } from "@/lib/queryKeys";
@@ -700,6 +703,7 @@ function FindingDetailsDialog({
 export const SecurityPanel = () => {
   const selectedAppId = useAtomValue(selectedAppIdAtom);
   const setSelectedChatId = useSetAtom(selectedChatIdAtom);
+  const pushRecentViewedChatId = useSetAtom(pushRecentViewedChatIdAtom);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { streamMessage } = useStreamChat({ hasChatId: false });
@@ -785,8 +789,10 @@ export const SecurityPanel = () => {
       // Create a new chat
       const chatId = await ipc.chat.createChat(selectedAppId);
 
-      // Navigate to the new chat
+      // Navigate to the new chat (pushRecentViewedChatId also registers it in
+      // sessionOpenedChatIds so the tab appears immediately in the tab bar)
       setSelectedChatId(chatId);
+      pushRecentViewedChatId(chatId);
       await navigate({ to: "/chat", search: { id: chatId } });
 
       // Stream the security review prompt
@@ -816,8 +822,10 @@ export const SecurityPanel = () => {
 
       const chatId = await ipc.chat.createChat(selectedAppId);
 
-      // Navigate to the new chat
+      // Navigate to the new chat (pushRecentViewedChatId also registers it in
+      // sessionOpenedChatIds so the tab appears immediately in the tab bar)
       setSelectedChatId(chatId);
+      pushRecentViewedChatId(chatId);
       await navigate({ to: "/chat", search: { id: chatId } });
 
       const prompt = `Please fix the following security issue in a simple and effective way:
@@ -885,8 +893,10 @@ ${finding.description}`;
       // Create a new chat
       const chatId = await ipc.chat.createChat(selectedAppId);
 
-      // Navigate to the new chat
+      // Navigate to the new chat (pushRecentViewedChatId also registers it in
+      // sessionOpenedChatIds so the tab appears immediately in the tab bar)
       setSelectedChatId(chatId);
+      pushRecentViewedChatId(chatId);
       await navigate({ to: "/chat", search: { id: chatId } });
 
       // Build a comprehensive prompt for all selected issues
