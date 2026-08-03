@@ -344,6 +344,15 @@ export function createFakeLlmApp(getPort: () => number) {
           hasFreeTier: true,
           gatewayPrefix: "gemini/",
         },
+        {
+          id: "minimax",
+          displayName: "MiniMax",
+          type: "cloud",
+          websiteUrl: "https://platform.minimax.io/",
+          secondary: true,
+          supportsThinking: true,
+          gatewayPrefix: "minimax/",
+        },
       ],
       modelsByProvider: {
         openai: [
@@ -399,6 +408,26 @@ export function createFakeLlmApp(getPort: () => number) {
             displayName: "Gemini 2.5 Pro",
             description: "Remote catalog Google model",
             maxOutputTokens: 65_535,
+          },
+        ],
+        minimax: [
+          {
+            apiName: "MiniMax-M3",
+            displayName: "MiniMax M3",
+            description: "Remote catalog MiniMax model",
+            dollarSigns: 2,
+            temperature: 1,
+            maxOutputTokens: 32_000,
+            contextWindow: 1_000_000,
+          },
+          {
+            apiName: "MiniMax-M2.7",
+            displayName: "MiniMax M2.7",
+            description: "Remote catalog MiniMax model",
+            dollarSigns: 1,
+            temperature: 1,
+            maxOutputTokens: 32_000,
+            contextWindow: 204_800,
           },
         ],
       },

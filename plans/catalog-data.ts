@@ -7,6 +7,7 @@ export const ProviderIdSchema = z.enum([
   "vertex",
   "openrouter",
   "xai",
+  "minimax",
 ]);
 
 export const ThemeGenerationAliasIdSchema = z.enum([
@@ -129,6 +130,15 @@ const providers = [
     displayName: "xAI",
     type: "cloud",
     websiteUrl: "https://docs.x.ai/docs/models",
+  },
+  {
+    id: "minimax",
+    displayName: "MiniMax",
+    type: "cloud",
+    websiteUrl: "https://platform.minimax.io/",
+    secondary: true,
+    supportsThinking: true,
+    gatewayPrefix: "minimax/",
   },
 ] satisfies z.infer<typeof CatalogProviderSchema>[];
 
@@ -264,6 +274,26 @@ const modelsByProvider = {
       dollarSigns: 3,
       temperature: 0,
       contextWindow: 256_000,
+    },
+  ],
+  minimax: [
+    {
+      apiName: "MiniMax-M3",
+      displayName: "MiniMax M3",
+      description: "Flagship model with a large context window",
+      dollarSigns: 2,
+      temperature: 1,
+      maxOutputTokens: 32_000,
+      contextWindow: 1_000_000,
+    },
+    {
+      apiName: "MiniMax-M2.7",
+      displayName: "MiniMax M2.7",
+      description: "Latest flagship model with enhanced reasoning and coding",
+      dollarSigns: 1,
+      temperature: 1,
+      maxOutputTokens: 32_000,
+      contextWindow: 204_800,
     },
   ],
 } satisfies z.infer<

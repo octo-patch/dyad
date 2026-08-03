@@ -30,6 +30,10 @@ testWithRemoteCatalog(
     await expect(
       po.page.getByText("GPT 5.2 Remote Only", { exact: true }),
     ).toBeVisible();
+    await po.page.getByText("More models", { exact: true }).click();
+    await po.page.getByText("MiniMax", { exact: true }).click();
+    await expect(po.page.getByText("MiniMax M3", { exact: true })).toBeVisible();
+    await expect(po.page.getByText("MiniMax M2.7", { exact: true })).toBeVisible();
 
     await po.navigation.goToLibraryTab();
     await po.page.getByRole("link", { name: "Themes" }).click();
