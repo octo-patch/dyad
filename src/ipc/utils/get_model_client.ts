@@ -42,6 +42,7 @@ import { FREE_PRO_MODEL_NAME, isFreeProModel } from "@/lib/freeProModel";
 import { getOpenRouterAppAttributionHeaders } from "./openrouter_attribution";
 import { resolveModelSelection } from "./model_effort";
 import { getModelPreferenceKey } from "@/lib/modelEffort";
+import { getMiniMaxOpenAIBaseUrl } from "./minimax_endpoint";
 
 // The test-only fetch seam lives in ./test_fetch_override (dependency-free,
 // so secondary factories can use it without import cycles). Re-exported here
@@ -634,7 +635,7 @@ function getRegularModelClient(
     case "minimax": {
       const provider = createOpenAICompatible({
         name: "minimax",
-        baseURL: "https://api.minimax.io/v1",
+        baseURL: getMiniMaxOpenAIBaseUrl(getEnvVar("MINIMAX_REGION")),
         apiKey,
         ...getModelClientFetchOption(),
       });
