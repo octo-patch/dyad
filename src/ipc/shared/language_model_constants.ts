@@ -520,9 +520,18 @@ export const MODEL_OPTIONS: Record<string, ModelOption[]> = {
   // https://platform.minimax.io/docs/api-reference/text-anthropic-api
   minimax: [
     {
+      name: "MiniMax-M3",
+      displayName: "MiniMax M3",
+      description: "Newest flagship model with a 1M token context window",
+      maxOutputTokens: 32_000,
+      contextWindow: 1_000_000,
+      temperature: 1.0,
+      dollarSigns: 2,
+    },
+    {
       name: "MiniMax-M2.7",
       displayName: "MiniMax M2.7",
-      description: "Latest flagship model with enhanced reasoning and coding",
+      description: "Previous flagship model with strong reasoning and coding",
       maxOutputTokens: 32_000,
       contextWindow: 204_800,
       temperature: 1.0,
