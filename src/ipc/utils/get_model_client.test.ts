@@ -62,6 +62,12 @@ vi.mock("../shared/language_model_helpers", () => ({
       name: "OpenRouter",
       type: "cloud",
     },
+    {
+      id: "minimax",
+      name: "MiniMax",
+      gatewayPrefix: "minimax/",
+      type: "cloud",
+    },
   ]),
 }));
 
@@ -369,5 +375,131 @@ describe("getModelClient", () => {
     expect(capturedHeaders?.get("X-OpenRouter-Categories")).toBe(
       OPENROUTER_APP_CATEGORIES,
     );
+  });
+
+  const chatCompletionResponse = () =>
+    new Response(
+      JSON.stringify({
+        id: "chatcmpl-test",
+        choices: [
+          {
+            message: {
+              role: "assistant",
+              content: "ok",
+            },
+            finish_reason: "stop",
+          },
+        ],
+      }),
+      {
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+
+  test("sends MiniMax requests to the global endpoint by default", async () => {
+    let capturedUrl: string | undefined;
+    setModelClientFetchForTesting(
+      vi.fn(async (url) => {
+        capturedUrl = url.toString();
+        return chatCompletionResponse();
+      }),
+    );
+
+    const { modelClient } = await getModelClient(
+      {
+        provider: "minimax",
+        name: "MiniMax-M2.7",
+      },
+      {
+        providerSettings: {
+          minimax: {
+            apiKey: {
+              value: "minimax-key",
+            },
+          },
+        },
+      } as unknown as UserSettings,
+    );
+
+    await generateText({
+      model: modelClient.model,
+      prompt: "hi",
+      maxRetries: 0,
+    });
+
+    expect(capturedUrl).toBe("https://api.minimax.io/v1/chat/completions");
+  });
+
+  test("sends MiniMax requests to the China endpoint for the cn_zh region", async () => {
+    let capturedUrl: string | undefined;
+    let capturedHeaders: Headers | undefined;
+    setModelClientFetchForTesting(
+      vi.fn(async (url, init) => {
+        capturedUrl = url.toString();
+        capturedHeaders = new Headers(init?.headers);
+        return chatCompletionResponse();
+      }),
+    );
+
+    const { modelClient } = await getModelClient(
+      {
+        provider: "minimax",
+        name: "MiniMax-M2.7",
+      },
+      {
+        providerSettings: {
+          minimax: {
+            apiKey: {
+              value: "minimax-key",
+            },
+            region: "cn_zh",
+          },
+        },
+      } as unknown as UserSettings,
+    );
+
+    await generateText({
+      model: modelClient.model,
+      prompt: "hi",
+      maxRetries: 0,
+    });
+
+    expect(capturedUrl).toBe("https://api.minimaxi.com/v1/chat/completions");
+    expect(capturedHeaders?.get("Authorization")).toBe("Bearer minimax-key");
+  });
+
+  test("falls back to the global MiniMax endpoint for an unknown region", async () => {
+    let capturedUrl: string | undefined;
+    setModelClientFetchForTesting(
+      vi.fn(async (url) => {
+        capturedUrl = url.toString();
+        return chatCompletionResponse();
+      }),
+    );
+
+    const { modelClient } = await getModelClient(
+      {
+        provider: "minimax",
+        name: "MiniMax-M2.7",
+      },
+      {
+        providerSettings: {
+          minimax: {
+            apiKey: {
+              value: "minimax-key",
+            },
+            region: "not-a-region",
+          },
+        },
+      } as unknown as UserSettings,
+    );
+
+    await generateText({
+      model: modelClient.model,
+      prompt: "hi",
+      maxRetries: 0,
+    });
+
+    expect(capturedUrl).toBe("https://api.minimax.io/v1/chat/completions");
   });
 });

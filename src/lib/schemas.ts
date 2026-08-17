@@ -118,6 +118,13 @@ export const AzureProviderSettingSchema = z.object({
   resourceName: z.string().optional(),
 });
 
+export const MiniMaxProviderSettingSchema = z.object({
+  apiKey: SecretSchema.optional(),
+  // Selects which regional MiniMax deployment requests are sent to.
+  // See MINIMAX_REGIONS in the language model constants.
+  region: z.string().optional(),
+});
+
 export const VertexProviderSettingSchema = z.object({
   // We make this undefined so that it makes existing callsites easier.
   apiKey: z.undefined(),
@@ -138,6 +145,7 @@ export const ProviderSettingSchema = z.union([
   // so doing passthrough keeps these extra fields.
   AzureProviderSettingSchema.passthrough(),
   VertexProviderSettingSchema.passthrough(),
+  MiniMaxProviderSettingSchema.passthrough(),
   RegularProviderSettingSchema.passthrough(),
 ]);
 
@@ -150,6 +158,9 @@ export type RegularProviderSetting = z.infer<
 >;
 export type AzureProviderSetting = z.infer<typeof AzureProviderSettingSchema>;
 export type VertexProviderSetting = z.infer<typeof VertexProviderSettingSchema>;
+export type MiniMaxProviderSetting = z.infer<
+  typeof MiniMaxProviderSettingSchema
+>;
 
 export const RuntimeModeSchema = z.enum(["web-sandbox", "local-node", "unset"]);
 export type RuntimeMode = z.infer<typeof RuntimeModeSchema>;

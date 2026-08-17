@@ -43,6 +43,7 @@ import {
 
 import { ProviderSettingsHeader } from "./ProviderSettingsHeader";
 import { ApiKeyConfiguration } from "./ApiKeyConfiguration";
+import { MiniMaxRegionConfiguration } from "./MiniMaxRegionConfiguration";
 import { ModelsSection } from "./ModelsSection";
 
 interface ProviderSettingsPageProps {
@@ -561,6 +562,14 @@ export function ProviderSettingsPage({ provider }: ProviderSettingsPageProps) {
               updateSettings={updateSettings}
               highlightPasteButton={highlightPasteButton}
               onDismissPasteHighlight={() => setHighlightPasteButton(false)}
+            />
+          )}
+
+          {provider === "minimax" && !settingsLoading && (
+            <MiniMaxRegionConfiguration
+              settings={settings}
+              envVars={envVars}
+              updateSettings={updateSettings}
             />
           )}
 

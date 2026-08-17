@@ -668,3 +668,70 @@ export const LOCAL_PROVIDERS: Record<
     hasFreeTier: true,
   },
 };
+
+/**
+ * MiniMax serves the same models from separate regional deployments, each with
+ * its own API hosts and documentation site. An account and its API key belong to
+ * one region, so requests have to be sent to the matching host.
+ *
+ * https://platform.minimax.io/docs/api-reference/api-overview
+ * https://platform.minimaxi.com/docs/api-reference/api-overview
+ */
+export interface MiniMaxRegionConfig {
+  displayName: string;
+  openaiBaseUrl: string;
+  anthropicBaseUrl: string;
+  docsRoot: string;
+}
+
+export const MINIMAX_REGIONS = {
+  global_en: {
+    displayName: "Global",
+    openaiBaseUrl: "https://api.minimax.io/v1",
+    anthropicBaseUrl: "https://api.minimax.io/anthropic",
+    docsRoot: "https://platform.minimax.io/docs",
+  },
+  cn_zh: {
+    displayName: "China",
+    openaiBaseUrl: "https://api.minimaxi.com/v1",
+    anthropicBaseUrl: "https://api.minimaxi.com/anthropic",
+    docsRoot: "https://platform.minimaxi.com/docs",
+  },
+} as const satisfies Record<string, MiniMaxRegionConfig>;
+
+export type MiniMaxRegion = keyof typeof MINIMAX_REGIONS;
+
+export const DEFAULT_MINIMAX_REGION: MiniMaxRegion = "global_en";
+
+export const MINIMAX_REGION_ENV_VAR = "MINIMAX_REGION";
+
+export const MINIMAX_REGION_IDS = Object.keys(
+  MINIMAX_REGIONS,
+) as MiniMaxRegion[];
+
+export function isMiniMaxRegion(value: unknown): value is MiniMaxRegion {
+  return typeof value === "string" && value in MINIMAX_REGIONS;
+}
+
+/**
+ * Normalizes a stored or environment-provided region id, falling back to the
+ * default region when the value is missing or unrecognized.
+ */
+export function resolveMiniMaxRegion(
+  value: string | null | undefined,
+): MiniMaxRegion {
+  const normalized = (value ?? "").trim().toLowerCase().replace(/-/g, "_");
+  return isMiniMaxRegion(normalized) ? normalized : DEFAULT_MINIMAX_REGION;
+}
+
+export function getMiniMaxRegionConfig(
+  region: MiniMaxRegion,
+): MiniMaxRegionConfig {
+  return MINIMAX_REGIONS[region];
+}
+
+export function getMiniMaxOpenAiBaseUrl(
+  value: string | null | undefined,
+): string {
+  return MINIMAX_REGIONS[resolveMiniMaxRegion(value)].openaiBaseUrl;
+}
