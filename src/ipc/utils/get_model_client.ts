@@ -14,10 +14,12 @@ import type {
   UserSettings,
   VertexProviderSetting,
   AzureProviderSetting,
+  MiniMaxProviderSetting,
 } from "../../lib/schemas";
 import { getEnvVar } from "./read_env";
 import log from "electron-log";
 import { FREE_OPENROUTER_MODEL_NAMES } from "../shared/language_model_constants";
+import { getMiniMaxRegion } from "../shared/minimax_regions";
 import { getLanguageModelProviders } from "../shared/language_model_helpers";
 import { resolveBuiltinModelAlias } from "../shared/remote_language_model_catalog";
 import { LanguageModelProvider } from "@/ipc/types";
@@ -638,9 +640,14 @@ function getRegularModelClient(
       };
     }
     case "minimax": {
+      // The API host is region-specific, so honor the region saved in settings
+      // and fall back to the global host for existing installs.
+      const minimaxSettings = settings.providerSettings?.minimax as
+        | MiniMaxProviderSetting
+        | undefined;
       const provider = createOpenAICompatible({
         name: "minimax",
-        baseURL: "https://api.minimax.io/v1",
+        baseURL: getMiniMaxRegion(minimaxSettings?.region).openaiBaseUrl,
         apiKey,
         ...getModelClientFetchOption(),
       });

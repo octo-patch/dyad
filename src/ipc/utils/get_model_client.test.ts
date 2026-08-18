@@ -62,6 +62,13 @@ vi.mock("../shared/language_model_helpers", () => ({
       name: "OpenRouter",
       type: "cloud",
     },
+    {
+      id: "minimax",
+      name: "MiniMax",
+      gatewayPrefix: "minimax/",
+      envVarName: "MINIMAX_API_KEY",
+      type: "cloud",
+    },
   ]),
 }));
 
@@ -370,4 +377,62 @@ describe("getModelClient", () => {
       OPENROUTER_APP_CATEGORIES,
     );
   });
+
+  test.each([
+    { region: undefined, expectedHost: "https://api.minimax.io/v1" },
+    { region: "global_en", expectedHost: "https://api.minimax.io/v1" },
+    { region: "cn_zh", expectedHost: "https://api.minimaxi.com/v1" },
+  ])(
+    "sends MiniMax requests to the host of the selected region ($region)",
+    async ({ region, expectedHost }) => {
+      let capturedUrl: string | undefined;
+      setModelClientFetchForTesting(
+        vi.fn(async (url) => {
+          capturedUrl = url.toString();
+          return new Response(
+            JSON.stringify({
+              id: "chatcmpl-test",
+              choices: [
+                {
+                  message: {
+                    role: "assistant",
+                    content: "ok",
+                  },
+                  finish_reason: "stop",
+                },
+              ],
+            }),
+            {
+              headers: { "Content-Type": "application/json" },
+            },
+          );
+        }),
+      );
+
+      const { modelClient } = await getModelClient(
+        {
+          provider: "minimax",
+          name: "MiniMax-M2.7",
+        },
+        {
+          providerSettings: {
+            minimax: {
+              apiKey: {
+                value: "minimax-key",
+              },
+              region,
+            },
+          },
+        } as unknown as UserSettings,
+      );
+
+      await generateText({
+        model: modelClient.model,
+        prompt: "hi",
+        maxRetries: 0,
+      });
+
+      expect(capturedUrl).toBe(`${expectedHost}/chat/completions`);
+    },
+  );
 });

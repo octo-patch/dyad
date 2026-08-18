@@ -3,6 +3,7 @@ import {
   isGoogleProviderSetup,
   isNonGoogleProviderSetup,
 } from "./providerUtils";
+import { MINIMAX_REGION_IDS } from "../ipc/shared/minimax_regions";
 
 export const SecretSchema = z.object({
   value: z.string(),
@@ -126,6 +127,11 @@ export const VertexProviderSettingSchema = z.object({
   serviceAccountKey: SecretSchema.optional(),
 });
 
+export const MiniMaxProviderSettingSchema = z.object({
+  apiKey: SecretSchema.optional(),
+  region: z.enum(MINIMAX_REGION_IDS).optional(),
+});
+
 export const ProviderSettingSchema = z.union([
   // Must use more specific type first!
   // Zod uses the first type that matches.
@@ -138,6 +144,7 @@ export const ProviderSettingSchema = z.union([
   // so doing passthrough keeps these extra fields.
   AzureProviderSettingSchema.passthrough(),
   VertexProviderSettingSchema.passthrough(),
+  MiniMaxProviderSettingSchema.passthrough(),
   RegularProviderSettingSchema.passthrough(),
 ]);
 
@@ -150,6 +157,9 @@ export type RegularProviderSetting = z.infer<
 >;
 export type AzureProviderSetting = z.infer<typeof AzureProviderSettingSchema>;
 export type VertexProviderSetting = z.infer<typeof VertexProviderSettingSchema>;
+export type MiniMaxProviderSetting = z.infer<
+  typeof MiniMaxProviderSettingSchema
+>;
 
 export const RuntimeModeSchema = z.enum(["web-sandbox", "local-node", "unset"]);
 export type RuntimeMode = z.infer<typeof RuntimeModeSchema>;

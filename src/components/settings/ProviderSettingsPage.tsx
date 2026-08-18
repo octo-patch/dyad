@@ -43,6 +43,7 @@ import {
 
 import { ProviderSettingsHeader } from "./ProviderSettingsHeader";
 import { ApiKeyConfiguration } from "./ApiKeyConfiguration";
+import { MiniMaxRegionSelector } from "./MiniMaxRegionSelector";
 import { ModelsSection } from "./ModelsSection";
 
 interface ProviderSettingsPageProps {
@@ -526,6 +527,15 @@ export function ProviderSettingsPage({ provider }: ProviderSettingsPageProps) {
               }
             }}
           />
+
+          {provider === "minimax" && !settingsLoading && !settingsError && (
+            <div className="mb-4">
+              <MiniMaxRegionSelector
+                settings={settings}
+                updateSettings={updateSettings}
+              />
+            </div>
+          )}
 
           {settingsLoading ? (
             <div className="space-y-4">
