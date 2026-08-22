@@ -638,9 +638,14 @@ function getRegularModelClient(
       };
     }
     case "minimax": {
+      // MiniMax exposes separate OpenAI-compatible endpoints by region. Set
+      // MINIMAX_API_BASE_URL to the regional /v1 URL when using the China
+      // service; the global endpoint remains the default.
+      const baseURL =
+        getEnvVar("MINIMAX_API_BASE_URL") || "https://api.minimax.io/v1";
       const provider = createOpenAICompatible({
         name: "minimax",
-        baseURL: "https://api.minimax.io/v1",
+        baseURL,
         apiKey,
         ...getModelClientFetchOption(),
       });
